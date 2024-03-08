@@ -66,21 +66,45 @@ function createTable(data) {
       });
 }
 
-// Function to display detailed information
-function showDetailsTODODelete(methodData) {
-  const detailModal = d3.select("#detail-modal");
-  const detailContent = d3.select("#detail-content");
-  detailContent.html(""); // Clear existing content
-  
-  // Generate and display detailed content
-  methodData.identifiers.forEach(identifier => {
-    Object.entries(identifier).forEach(([key, value]) => {
-      detailContent.append("p").text(`${key}: ${JSON.stringify(value, null, 2)}`);
-    });
-  });
+function readAndMergeFiles() {
+  const input = document.getElementById('fileInput');
+  const files = input.files;
+  const readers = [];
 
-  detailModal.style("display", "block");
+  // Initialize an object to hold your merged results
+  const mergedResults = {};
+
+  // Use FileReader to read each selected file
+  for (let file of files) {
+    const reader = new FileReader();
+    reader.readAsText(file);
+    readers.push(new Promise(resolve => {
+      reader.onload = () => {
+        resolve(JSON.parse(reader.result));
+      };
+    }));
+  }
+
+  // Wait for all files to be read and processed
+  Promise.all(readers).then(results => {
+    results.forEach(data => {
+      // Assuming each file is an object with methods as keys
+      Object.keys(data).forEach(method => {
+        if (!mergedResults[method]) {
+          mergedResults[method] = [];
+        }
+        // Push this file's data for the method into the array
+        mergedResults[method].push(data[method]);
+      });
+    });
+
+    // At this point, `mergedResults` is populated with your data
+    console.log(mergedResults);
+
+    // Optionally, process `mergedResults` further or display it on the page
+  });
 }
+
 
 function showDetails(methodData) {
   const detailModal = d3.select("#detail-modal");
