@@ -35,7 +35,7 @@ function createTable(data) {
     })
     .on("click", function (event, d) {
       if (typeof d === "string" && d.startsWith("did")) {
-        showDetails(data[d]);
+        showDetails(data.find((e) => e.method === d));
       }
     });
 }
